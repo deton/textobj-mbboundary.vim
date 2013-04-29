@@ -4,7 +4,7 @@ scriptencoding utf-8
 " plugin/textobj/mbboundary.vim - ASCII文字と日本語文字の境界区切りでtext-object
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2013-04-27
+" Last Change: 2013-04-29
 "
 " Description:
 "   日本語文字中の英語のフレーズを扱いやすくするためのプラグイン。
@@ -71,20 +71,20 @@ function! s:select_function_wrapperv(function_name, inner)
   if s:pos_lt(pos, otherpos)
     " backward
     if a:inner
-      call s:select_b(cnt, 1)
+      let _ = s:select_b(cnt, 1)
     else
-      call s:select_b(cnt, 0)
+      let _ = call s:select_b(cnt, 0)
     endif
   else
     if a:inner
-      call s:select_i(cnt, 1)
+      let _ = s:select_i(cnt, 1)
     else
-      call s:select_a(cnt, 1)
+      let _ = s:select_a(cnt, 1)
     endif
   endif
-  let newpos = getpos('.')
+  let [motion_type, start_position, end_position] = _
   normal! gv
-  call setpos('.', newpos)
+  call setpos('.', end_position)
 endfunction
 
 function! s:select_a(cnt, visual)
@@ -131,9 +131,13 @@ function! s:select(cnt, inner, visual)
   " 対象文字列末尾の空白は含めない。
   if trimendsp && match(getline('.'), '\%' . col('.') . 'c\s') != -1
     call search('\S', 'bW')
-    let ed = getpos('.')
+    let edtmp = getpos('.')
+    if s:pos_lt(st, edtmp)
+      let ed = edtmp
+    " else 末尾の空白を除くと開始位置以前になって何も選択されなくなる場合は、
+    " 空白も対象にする
+    endif
   endif
-  " FIXME: Visual modeでspaceの直前まで選んだ状態でimしても、伸ばせない
   return ['v', st, ed]
 endfunction
 
