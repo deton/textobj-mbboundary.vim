@@ -73,7 +73,7 @@ function! s:select_function_wrapperv(function_name, inner)
     if a:inner
       let _ = s:select_b(cnt, 1)
     else
-      let _ = call s:select_b(cnt, 0)
+      let _ = s:select_b(cnt, 0)
     endif
   else
     if a:inner
