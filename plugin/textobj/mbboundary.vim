@@ -190,7 +190,7 @@ endfunction
 function! s:onascii()
   let line = getline('.')
   " 空行 || ASCII文字上かどうか
-  if line == '' || match(line, '\%' . col('.') . 'c[[:print:]]') != -1
+  if line == '' || match(line, '\%' . col('.') . 'c[\x00-\xff]') != -1
     return 1 " 空行 || ASCII文字上
   endif
   return 0 " ASCII文字上でない場合
@@ -271,9 +271,9 @@ endfunction
 
 function! s:move_n()
   if s:onascii()
-    let pat = '[^[:print:]]'
+    let pat = '[^\x00-\xff]'
   else
-    let pat = '[[:print:]]'
+    let pat = '[\x00-\xff]'
   endif
   if search(pat, 'W') > 0
     return
@@ -284,9 +284,9 @@ endfunction
 
 function! s:move_p()
   if s:onascii()
-    let pat = '[^[:print:]]\+'
+    let pat = '[^\x00-\xff]\+'
   else
-    let pat = '[[:print:]]\+'
+    let pat = '[\x00-\xff]\+'
   endif
   if search(pat, 'bW') > 0
     return
@@ -297,10 +297,9 @@ endfunction
 " 現在位置の文字種(ASCIIかマルチバイト)が続いている先頭位置まで戻る
 function! s:move_head()
   if s:onascii()
-    " TODO: [:print:]でなく[0x00-0xff]にする。CTRL-L等をマルチバイトにしない
-    let pat = '[[:print:]]\+'
+    let pat = '[\x00-\xff]\+'
   else
-    let pat = '[^[:print:]]\+'
+    let pat = '[^\x00-\xff]\+'
   endif
   if search(pat, 'bcW') > 0
     return
