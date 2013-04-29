@@ -141,10 +141,9 @@ function! s:select(cnt, inner, visual)
   return ['v', st, ed]
 endfunction
 
+" Visual modeでbackwardにextendする
 function! s:select_b(cnt, inner)
-  let origpos = getpos('.')
-  let startonsp = 0
-  call search('.', 'bW') " 繰り返しam/imした場合にextendするため
+  call s:move_left() " 繰り返しam/imした場合にextendするため
   let st = getpos('.')
   let cnt = a:cnt
   let extendbegsp = 1
@@ -157,7 +156,6 @@ function! s:select_b(cnt, inner)
     endif
   endif
   call s:MoveCount('<SID>move_head', cnt)
-  " FIXME: 英字1文字だけ選択されずにその前のマルチバイト文字まで選択される
 
   " 現在位置直前の空白を含める
   if extendbegsp && search('\S', 'bW') > 0
@@ -208,13 +206,17 @@ function! s:PrevStrEndPos()
     return getpos('.')
   endif
   " 現在位置の直前まで
+  call s:move_left()
+  return getpos('.')
+endfunction
+
+function! s:move_left()
   if col('.') > 1
     call cursor(0, col('.') - 1)
   else
     call cursor(line('.') - 1, 0)
     call cursor(0, col('$'))
   endif
-  return getpos('.')
 endfunction
 
 function! s:MoveCount(func, cnt)
