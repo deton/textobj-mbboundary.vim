@@ -146,22 +146,29 @@ function! s:select_b(cnt, inner)
   call s:move_left() " 繰り返しam/imした場合にextendするため
   let st = getpos('.')
   let cnt = a:cnt
-  let extendbegsp = 1
+  let trimbegsp = 0
   if a:inner
     let cnt = (a:cnt + 1) / 2
     if a:cnt % 2 == 0
-      let extendbegsp = 1
+      let trimbegsp = 0
     else
-      let extendbegsp = 0
+      let trimbegsp = 1
     endif
   endif
   call s:MoveCount('<SID>move_head', cnt)
 
-  " 現在位置直前の空白を含める
-  if extendbegsp && search('\S', 'bW') > 0
-    call search('.', 'W')
+  let ed = getpos('.')
+  " 対象文字列先頭の空白は含めない
+  if trimbegsp && match(getline('.'), '\%' . col('.') . 'c\s') != -1
+    call search('\S', 'W')
+    let edtmp = getpos('.')
+    if s:pos_lt(edtmp, st)
+      let ed = edtmp
+    " else 先頭の空白を除くと開始位置以降になって何も選択されなくなる場合は、
+    " 空白も対象にする
+    endif
   endif
-  return ['v', st, getpos('.')]
+  return ['v', st, ed]
 endfunction
 
 " カーソルがASCII文字上かどうか
