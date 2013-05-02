@@ -4,7 +4,7 @@ scriptencoding utf-8
 " plugin/textobj/mbboundary.vim - ASCII文字と日本語文字の境界区切りでtext-object
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2013-04-30
+" Last Change: 2013-05-02
 "
 " Description:
 "   日本語文字中の英語のフレーズを扱いやすくするためのプラグイン。
@@ -282,13 +282,20 @@ function! s:move_n()
   call cursor(0, col('$'))
 endfunction
 
+" 現在位置の文字種(ASCIIかマルチバイト)が続いている先頭位置まで戻る。
+" 既に先頭位置の場合は、直前の文字種列の先頭位置まで戻る。
 function! s:move_p()
+  let origpos = getpos('.')
+  call s:move_head()
+  if s:pos_lt(getpos('.'), origpos)
+    return
+  endif
   if s:onascii()
     let pat = '[^\x00-\xff]\+'
   else
     let pat = '[\x00-\xff]\+'
   endif
-  if search(pat, 'bW') > 0
+  if search(pat, 'bcW') > 0
     return
   endif
   call cursor(1, 1)
