@@ -20,13 +20,10 @@ endif
 
 nnoremap <silent> <Plug>MBBoundaryMoveNF :<C-U>call <SID>MoveCount('<SID>move_n', v:count1)<CR>
 nnoremap <silent> <Plug>MBBoundaryMoveNB :<C-U>call <SID>MoveCount('<SID>move_p', v:count1)<CR>
-nnoremap <silent> <Plug>MBBoundaryMoveNH :<C-U>call <SID>MoveCount('<SID>move_head', v:count1)<CR>
 onoremap <silent> <Plug>MBBoundaryMoveOF :<C-U>call <SID>MoveCount('<SID>move_n', v:count1)<CR>
 onoremap <silent> <Plug>MBBoundaryMoveOB :<C-U>call <SID>MoveCount('<SID>move_p', v:count1)<CR>
-onoremap <silent> <Plug>MBBoundaryMoveOH :<C-U>call <SID>MoveCount('<SID>move_head', v:count1)<CR>
 vnoremap <silent> <Plug>MBBoundaryMoveVF <Esc>:call <SID>MoveV('<SID>move_n')<CR>
 vnoremap <silent> <Plug>MBBoundaryMoveVB <Esc>:call <SID>MoveV('<SID>move_p')<CR>
-vnoremap <silent> <Plug>MBBoundaryMoveVH <Esc>:call <SID>MoveV('<SID>move_head')<CR>
 
 onoremap <silent> <Plug>MBBoundaryTextObjA :<C-U>call <SID>select_function_wrapper('<SID>select_a', v:count1)<CR>
 onoremap <silent> <Plug>MBBoundaryTextObjI :<C-U>call <SID>select_function_wrapper('<SID>select_i', v:count1)<CR>
@@ -42,13 +39,10 @@ if !get(g:, 'mbboundary_no_default_key_mappings', 0)
     " "gm"を上書き
     nmap <silent> gm <Plug>MBBoundaryMoveNF
     nmap <silent> gM <Plug>MBBoundaryMoveNB
-    nmap <silent> g<C-M> <Plug>MBBoundaryMoveNH
     omap <silent> gm <Plug>MBBoundaryMoveOF
     omap <silent> gM <Plug>MBBoundaryMoveOB
-    omap <silent> g<C-M> <Plug>MBBoundaryMoveOH
     xmap <silent> gm <Plug>MBBoundaryMoveVF
     xmap <silent> gM <Plug>MBBoundaryMoveVB
-    xmap <silent> g<C-M> <Plug>MBBoundaryMoveVH
   endif
 endif
 
