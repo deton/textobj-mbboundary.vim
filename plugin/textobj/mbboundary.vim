@@ -4,7 +4,7 @@ scriptencoding utf-8
 " plugin/textobj/mbboundary.vim - ASCII文字と日本語文字の境界区切りでtext-object
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2013-05-02
+" Last Change: 2013-05-08
 "
 " Description:
 "   日本語文字中の英語のフレーズを扱いやすくするためのプラグイン。
@@ -35,15 +35,13 @@ if !get(g:, 'mbboundary_no_default_key_mappings', 0)
   omap <silent> im <Plug>MBBoundaryTextObjI
   xmap <silent> am <Plug>MBBoundaryTextObjVA
   xmap <silent> im <Plug>MBBoundaryTextObjVI
-  if get(g:, 'mbboundary_default_motion_key_mappings', 0)
-    " "gm"を上書き
-    nmap <silent> gm <Plug>MBBoundaryMoveNF
-    nmap <silent> gM <Plug>MBBoundaryMoveNB
-    omap <silent> gm <Plug>MBBoundaryMoveOF
-    omap <silent> gM <Plug>MBBoundaryMoveOB
-    xmap <silent> gm <Plug>MBBoundaryMoveVF
-    xmap <silent> gM <Plug>MBBoundaryMoveVB
-  endif
+  " gmを上書きしないようにgnにmap
+  nmap <silent> gn <Plug>MBBoundaryMoveNF
+  nmap <silent> gN <Plug>MBBoundaryMoveNB
+  omap <silent> gn <Plug>MBBoundaryMoveOF
+  omap <silent> gN <Plug>MBBoundaryMoveOB
+  xmap <silent> gn <Plug>MBBoundaryMoveVF
+  xmap <silent> gN <Plug>MBBoundaryMoveVB
 endif
 
 " from vim-textobj-user
