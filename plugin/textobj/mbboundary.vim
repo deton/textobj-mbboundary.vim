@@ -183,7 +183,7 @@ function! s:onascii()
   let line = getline('.')
   if line == ''
     return -1 " 空行
-  elseif match(line, '\%' . col('.') . 'c[\x00-\xff]') != -1
+  elseif match(line, '\%' . col('.') . 'c[\x00-\x7f]') != -1
     return 1 " ASCII文字上
   endif
   return 0 " ASCII文字上でない場合
@@ -269,9 +269,9 @@ function! s:move_n()
   if onascii == -1 " 空行上
     let pat = '.'
   elseif onascii == 1
-    let pat = '^$\|[^\x00-\xff]'
+    let pat = '^$\|[^\x00-\x7f]'
   else
-    let pat = '^$\|[\x00-\xff]'
+    let pat = '^$\|[\x00-\x7f]'
   endif
   if search(pat, 'W') > 0
     return
@@ -298,9 +298,9 @@ function! s:move_p()
     return
   " 同種文字列を検索して、その直後にカーソルを移動
   elseif onascii == 1
-    let pat = '^$\|[\x00-\xff]'
+    let pat = '^$\|[\x00-\x7f]'
   else
-    let pat = '^$\|[^\x00-\xff]'
+    let pat = '^$\|[^\x00-\x7f]'
   endif
   if search(pat, 'bW') == 0
     call cursor(1, 1)
@@ -336,10 +336,10 @@ function! s:move_head()
     call s:move_emptylines_top()
     return
   elseif onascii == 1
-    let pat = '[\x00-\xff]\+'
+    let pat = '[\x00-\x7f]\+'
     let ascii = 1
   else
-    let pat = '[^\x00-\xff]\+'
+    let pat = '[^\x00-\x7f]\+'
     let ascii = 0
   endif
   while 1
