@@ -181,9 +181,10 @@ endfunction
 " カーソルがASCII文字上かどうか
 function! s:onascii()
   let line = getline('.')
-  " 空行 || ASCII文字上かどうか
-  if line == '' || match(line, '\%' . col('.') . 'c[\x00-\xff]') != -1
-    return 1 " 空行 || ASCII文字上
+  if line == ''
+    return -1 " 空行
+  elseif match(line, '\%' . col('.') . 'c[\x00-\xff]') != -1
+    return 1 " ASCII文字上
   endif
   return 0 " ASCII文字上でない場合
 endfunction
@@ -264,10 +265,13 @@ function! s:pos_eq(pos1, pos2)  " equal
 endfunction
 
 function! s:move_n()
-  if s:onascii()
-    let pat = '[^\x00-\xff]'
+  let onascii = s:onascii()
+  if onascii == -1 " 空行上
+    let pat = '.'
+  elseif onascii == 1
+    let pat = '^$\|[^\x00-\xff]'
   else
-    let pat = '[\x00-\xff]'
+    let pat = '^$\|[\x00-\xff]'
   endif
   if search(pat, 'W') > 0
     return
@@ -284,23 +288,54 @@ function! s:move_p()
   if s:pos_lt(getpos('.'), origpos)
     return
   endif
-  " 既に先頭位置の場合、同種文字列を検索して、その直後にカーソルを移動
-  if s:onascii()
-    let pat = '[\x00-\xff]'
+  " 既に先頭位置の場合
+  let onascii = s:onascii()
+  if onascii == -1 " 先頭位置 == 連続空行の最初の空行
+    if s:move_left() == -1
+      return
+    endif
+    call s:move_head()
+    return
+  " 同種文字列を検索して、その直後にカーソルを移動
+  elseif onascii == 1
+    let pat = '^$\|[\x00-\xff]'
   else
-    let pat = '[^\x00-\xff]'
+    let pat = '^$\|[^\x00-\xff]'
   endif
-  if search(pat, 'bW') > 0
-    " <Space>でカーソル移動。&whichwrapに's'が含まれている必要あり
-    normal! 1 
+  if search(pat, 'bW') == 0
+    call cursor(1, 1)
+  endif
+  " <Space>でカーソル移動。&whichwrapに's'が含まれている必要あり
+  normal! 1 
+  if s:pos_lt(getpos('.'), origpos)
     return
   endif
-  call cursor(1, 1)
+  " 空行の直後だった場合。連続する空行の最初の空行に移動
+  call s:move_emptylines_top()
+endfunction
+
+" 連続空行の最初の空行まで戻る。
+" 前提条件: カーソルが空行上にある
+function! s:move_emptylines_top()
+  while 1
+    if s:move_left() == -1
+      return
+    endif
+    if s:onascii() != -1
+      normal! 1 
+      return
+    endif
+  endwhile
 endfunction
 
 " 現在位置の文字種(ASCIIかマルチバイト)が続いている先頭位置まで戻る
 function! s:move_head()
-  if s:onascii()
+  let onascii = s:onascii()
+  if onascii == -1 " 空行上
+    " 連続空行の場合、最初の空行まで戻る
+    call s:move_emptylines_top()
+    return
+  elseif onascii == 1
     let pat = '[\x00-\xff]\+'
     let ascii = 1
   else
@@ -320,7 +355,7 @@ function! s:move_head()
       return
     endif
     let onascii = s:onascii()
-    if onascii != ascii
+    if onascii == -1 || onascii != ascii
       normal! 1 
       return
     endif
