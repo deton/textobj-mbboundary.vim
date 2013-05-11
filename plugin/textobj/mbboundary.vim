@@ -4,7 +4,7 @@ scriptencoding utf-8
 " plugin/textobj/mbboundary.vim - ASCII文字と日本語文字の境界区切りでtext-object
 "
 " Maintainer: KIHARA Hideto <deton@m1.interq.or.jp>
-" Last Change: 2013-05-08
+" Last Change: 2013-05-11
 "
 " Description:
 "   日本語文字中の英語のフレーズを扱いやすくするためのプラグイン。
@@ -226,10 +226,12 @@ endfunction
 
 function! s:move_left()
   if col('.') > 1
-    call cursor(0, col('.') - 1)
-  else
+    return cursor(0, col('.') - 1)
+  elseif line('.') > 1
     call cursor(line('.') - 1, 0)
-    call cursor(0, col('$'))
+    return cursor(0, col('$'))
+  else
+    return -1
   endif
 endfunction
 
@@ -282,12 +284,15 @@ function! s:move_p()
   if s:pos_lt(getpos('.'), origpos)
     return
   endif
+  " 既に先頭位置の場合、同種文字列を検索して、その直後にカーソルを移動
   if s:onascii()
-    let pat = '[^\x00-\xff]\+'
+    let pat = '[\x00-\xff]'
   else
-    let pat = '[\x00-\xff]\+'
+    let pat = '[^\x00-\xff]'
   endif
-  if search(pat, 'bcW') > 0
+  if search(pat, 'bW') > 0
+    " <Space>でカーソル移動。&whichwrapに's'が含まれている必要あり
+    normal! 1 
     return
   endif
   call cursor(1, 1)
@@ -297,11 +302,27 @@ endfunction
 function! s:move_head()
   if s:onascii()
     let pat = '[\x00-\xff]\+'
+    let ascii = 1
   else
     let pat = '[^\x00-\xff]\+'
+    let ascii = 0
   endif
-  if search(pat, 'bcW') > 0
-    return
-  endif
-  call cursor(1, 1)
+  while 1
+    if search(pat, 'bcW') == 0
+      call cursor(1, 1)
+      return
+    endif
+    if col('.') > 1
+      return
+    endif
+    " \_[]にしても、前行まで戻ってくれないので、自前でチェック
+    if s:move_left() == -1
+      return
+    endif
+    let onascii = s:onascii()
+    if onascii != ascii
+      normal! 1 
+      return
+    endif
+  endwhile
 endfunction
