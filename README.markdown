@@ -36,7 +36,7 @@ Vimでは、どのtext-objectを使うかをユーザが簡単に選べるので
 * Vim組み込みの、[`i"`](http://vim-jp.org/vimdoc-ja/motion.html#iquote),
   `i)`, `it`等
 
-    ""や()や`<tag>`内の文字列を対象とするtext object。
+    ""や()や`<tag></tag>`にはさまれた文字列を対象とするtext object。
 
 * [textobj-jabraces](http://kana.github.io/config/vim/textobj-jabraces.html)
 
